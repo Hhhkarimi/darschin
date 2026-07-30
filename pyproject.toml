@@ -1,0 +1,8 @@
+[project]
+name = "darschin-solver"
+version = "3.0.0"
+description = "Exact CP-SAT scheduling function for Darschin"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "ortools==9.12.4544",
+]
