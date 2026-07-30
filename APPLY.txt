@@ -1,4 +1,18 @@
-1. Copy pyproject.toml and .python-version to the repository root.
-2. Delete requirements.txt from the repository:
-   git rm requirements.txt
-3. Commit all three changes and redeploy without build cache.
+اصلاح جهت خروجی برنامهٔ هفتگی
+
+فایل‌های داخل این بسته را با حفظ مسیر در ریشهٔ مخزن جایگزین کنید.
+نتیجه:
+- روزهای هفته در ردیف‌ها
+- بازه‌های زمانی در ستون‌ها
+- اعمال در نمای بصری، جدول دسترس‌پذیر، چاپ و Excel
+- اعمال در برگهٔ اصلی و برگه‌های استاد، گروه دانشجویی و اتاق
+- CSV بدون تغییر، چون خروجی رکوردی است
+
+فرمان‌های پیشنهادی:
+  npm install
+  npm run typecheck
+  npm run test
+  npm run build
+  git add src/components/ScheduleViews.tsx src/components/ScheduleViews.test.tsx src/services/excel.ts src/services/excel.test.ts src/styles/global.css
+  git commit -m "Transpose timetable output layout"
+  git push

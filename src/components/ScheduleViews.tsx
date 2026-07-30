@@ -15,7 +15,11 @@ export function ScheduleViews({ input, result, onResultChange }: { input: Timeta
     return [];
   }, [filter, input]);
   const activeEntity = options.some((item) => item.value === entity) ? entity : options[0]?.value ?? "";
-  const items = result.schedule.filter((item) => filter === "all" || (filter === "instructor" && item.instructorId === activeEntity) || (filter === "group" && item.studentGroupId === activeEntity) || (filter === "course" && item.courseId === activeEntity) || (filter === "room" && item.roomId === activeEntity));
+  const items = result.schedule.filter((item) => filter === "all"
+    || (filter === "instructor" && item.instructorId === activeEntity)
+    || (filter === "group" && item.studentGroupId === activeEntity)
+    || (filter === "course" && item.courseId === activeEntity)
+    || (filter === "room" && item.roomId === activeEntity));
 
   return <section className="result-card" aria-labelledby="schedule-title">
     <header className="card-header"><div><span>برنامهٔ هفتگی</span><h2 id="schedule-title">نتیجهٔ قابل بررسی</h2></div><div className={`status-badge status-${result.status}`}>{statusLabel(result)}</div></header>
@@ -25,7 +29,7 @@ export function ScheduleViews({ input, result, onResultChange }: { input: Timeta
       {filter !== "all" && <label>مورد<select value={activeEntity} onChange={(event) => setEntity(event.target.value)}>{options.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>}
     </div>
     {view === "visual" ? <VisualGrid input={input} items={items} /> : <AccessibleScheduleTable input={input} items={items} />}
-    <div className="print-only"><AccessibleScheduleTable input={input} items={items} /></div>
+    <div className="print-only" aria-hidden="true"><AccessibleScheduleTable input={input} items={items} /></div>
     <ManualMove input={input} result={result} onResultChange={onResultChange} />
   </section>;
 }
@@ -41,13 +45,63 @@ function statusLabel(result: SolveResult): string {
   return "وضعیت نامشخص";
 }
 
+function slotItems(items: ScheduleItem[], dayId: string, periodIndex: number): { starts: ScheduleItem[]; continuing: ScheduleItem[] } {
+  return {
+    starts: items.filter((item) => item.dayId === dayId && item.startPeriod === periodIndex),
+    continuing: items.filter((item) => item.dayId === dayId && item.startPeriod < periodIndex && item.occupiedPeriods.includes(periodIndex)),
+  };
+}
+
+function ScheduleEntries({ starts, continuing, detailed = false }: { starts: ScheduleItem[]; continuing: ScheduleItem[]; detailed?: boolean }) {
+  return <>
+    {starts.map((item) => <article key={item.sessionId} className={detailed ? "schedule-item table-schedule-item" : "schedule-item"}>
+      <strong>{item.courseCode} · گروه {item.groupNumber.toLocaleString("fa-IR")}</strong>
+      {detailed && <span>{item.courseName}</span>}
+      <span>{item.sessionLabel}</span>
+      <small>استاد: {item.instructorName}</small>
+      {detailed && <small>گروه دانشجویی: {item.studentGroupName}</small>}
+      <small>{item.roomName} · {item.building}</small>
+      <small>{WEEK_PATTERN_LABELS[item.weekPattern]}</small>
+    </article>)}
+    {continuing.length > 0 && <span className="continuation">ادامهٔ {continuing.map((item) => `${item.courseCode} (گروه ${item.groupNumber.toLocaleString("fa-IR")})`).join("، ")}</span>}
+  </>;
+}
+
+function PeriodHeader({ input, periodIndex }: { input: TimetableInput; periodIndex: number }) {
+  const period = input.periods[periodIndex];
+  return <><strong>{period.label}</strong><span dir="ltr">{period.start}–{period.end}</span>{period.breakAfter && <em>{period.breakLabel || "وقفه"}</em>}</>;
+}
+
 function VisualGrid({ input, items }: { input: TimetableInput; items: ScheduleItem[] }) {
   const days = input.days.filter((item) => item.enabled);
-  return <div className="schedule-scroll" tabIndex={0} aria-label="نمای بصری برنامه؛ برای جزئیات کامل از جدول دسترس‌پذیر استفاده کنید"><div className="week-grid" style={{ gridTemplateColumns: `96px repeat(${days.length}, minmax(170px, 1fr))` }}><div className="grid-header">زمان</div>{days.map((day) => <div className="grid-header" key={day.id}>{day.label}</div>)}{input.periods.map((period) => <div className="grid-row" key={period.index}><div className="grid-time"><strong>{period.label}</strong><span dir="ltr">{period.start}–{period.end}</span>{period.breakAfter && <em>{period.breakLabel || "وقفه"}</em>}</div>{days.map((day) => { const starts = items.filter((item) => item.dayId === day.id && item.startPeriod === period.index); const continuing = items.filter((item) => item.dayId === day.id && item.startPeriod < period.index && item.occupiedPeriods.includes(period.index)); return <div className="grid-cell" key={`${day.id}-${period.index}`}>{starts.map((item) => <article key={item.sessionId} className="schedule-item"><strong>{item.courseCode} · گروه {item.groupNumber.toLocaleString("fa-IR")}</strong><span>{item.sessionLabel}</span><small>{item.instructorName}</small><small>{item.roomName} · {item.building}</small><small>{WEEK_PATTERN_LABELS[item.weekPattern]}</small></article>)}{!starts.length && continuing.length > 0 && <span className="continuation">ادامهٔ {continuing.map((item) => item.courseCode).join("، ")}</span>}</div>; })}</div>)}</div></div>;
+  return <div className="schedule-scroll" tabIndex={0} aria-label="نمای بصری برنامه؛ روزها در ردیف و بازه‌های زمانی در ستون">
+    <div className="week-grid" style={{ gridTemplateColumns: `120px repeat(${input.periods.length}, minmax(185px, 1fr))` }}>
+      <div className="grid-header grid-corner">روز / زمان</div>
+      {input.periods.map((period) => <div className="grid-header grid-period-header" key={period.index}><PeriodHeader input={input} periodIndex={period.index} /></div>)}
+      {days.map((day) => <div className="grid-row" key={day.id}>
+        <div className="grid-time grid-day"><strong>{day.label}</strong></div>
+        {input.periods.map((period) => {
+          const { starts, continuing } = slotItems(items, day.id, period.index);
+          return <div className="grid-cell" key={`${day.id}-${period.index}`}><ScheduleEntries starts={starts} continuing={continuing} /></div>;
+        })}
+      </div>)}
+    </div>
+  </div>;
 }
 
 function AccessibleScheduleTable({ input, items }: { input: TimetableInput; items: ScheduleItem[] }) {
-  return <div className="table-scroll"><table className="schedule-table"><caption>همهٔ اطلاعات نمایش‌داده‌شده در نمای هفتگی</caption><thead><tr><th>روز</th><th>زمان</th><th>درس</th><th>شماره گروه</th><th>جلسه</th><th>استاد</th><th>گروه دانشجویی</th><th>اتاق</th><th>ساختمان</th><th>هفته</th></tr></thead><tbody>{items.map((item) => <tr key={item.sessionId}><td>{input.days.find((day) => day.id === item.dayId)?.label}</td><td>{input.periods[item.startPeriod]?.start}–{input.periods[Math.max(...item.occupiedPeriods)]?.end}</td><td>{item.courseCode} — {item.courseName}</td><td>{item.groupNumber.toLocaleString("fa-IR")}</td><td>{item.sessionLabel}</td><td>{item.instructorName}</td><td>{item.studentGroupName}</td><td>{item.roomName}</td><td>{item.building}</td><td>{WEEK_PATTERN_LABELS[item.weekPattern]}</td></tr>)}</tbody></table></div>;
+  const days = input.days.filter((item) => item.enabled);
+  return <div className="table-scroll"><table className="schedule-table schedule-matrix">
+    <caption>برنامهٔ هفتگی؛ روزهای هفته در ردیف و بازه‌های زمانی در ستون</caption>
+    <thead><tr><th scope="col">روز / زمان</th>{input.periods.map((period) => <th scope="col" key={period.index}><PeriodHeader input={input} periodIndex={period.index} /></th>)}</tr></thead>
+    <tbody>{days.map((day) => <tr key={day.id}>
+      <th scope="row">{day.label}</th>
+      {input.periods.map((period) => {
+        const { starts, continuing } = slotItems(items, day.id, period.index);
+        return <td key={`${day.id}-${period.index}`}><ScheduleEntries starts={starts} continuing={continuing} detailed /></td>;
+      })}
+    </tr>)}</tbody>
+  </table></div>;
 }
 
 function ManualMove({ input, result, onResultChange }: { input: TimetableInput; result: SolveResult; onResultChange: (next: SolveResult) => void }) {
