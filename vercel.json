@@ -1,12 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "fluid": true,
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
     "api/solve.py": {
       "maxDuration": 300,
-      "excludeFiles": "{src/**,docs/**,public/**,**/*.test.*,api/tests/**}"
+      "excludeFiles": "{src/**,docs/**,public/**,tools/**,scripts/**,.github/**,dist/**,node_modules/**,api/tests/**,**/*.test.*,**/__pycache__/**,**/*.pyc,*.md}"
     }
   },
   "headers": [
