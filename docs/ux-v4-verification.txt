@@ -1,0 +1,26 @@
+درس‌چین — گزارش بررسی نسخهٔ بازمهندسی UX v4
+تاریخ: ۲۰۲۶-۰۷-۳۰
+
+نتایج اجراشده در محیط تحویل
+--------------------------------
+PASS  TypeScript structural typecheck (production source, tests excluded)
+PASS  Domain TypeScript compilation
+PASS  Static production policy check — 44 production text files
+PASS  Python source compilation
+PASS  API validation unit tests — 6 passed
+SKIP  CP-SAT integration tests — 2 skipped because OR-Tools is not installed in this environment
+PASS  Domain smoke — 3/3 sample sessions scheduled, 100% coverage
+PASS  Result dashboard smoke — 6 day bars, 2 room bars, actionable recommendation generated
+PASS  Safe deletion smoke — instructor, room, equipment and arbitrary period deletion
+PASS  Excel template ZIP integrity
+PASS  Excel template — 10 worksheets and no cached formula-error values
+
+مواردی که در این محیط اجرا نشد
+--------------------------------
+NOT RUN  npm dependency installation
+NOT RUN  Vite production build
+NOT RUN  Vitest browser/component suite
+NOT RUN  ESLint
+
+علت: رجیستری داخلی محیط تحویل بستهٔ @eslint/js@9.39.5 را با خطای 404 برنگرداند.
+این محدودیت مربوط به محیط تحویل است؛ Vercel پیش‌تر همین درخت وابستگی را نصب و فرانت‌اند را build کرده بود. پس از اعمال patch، در مخزن خودتان npm run verify را اجرا کنید.

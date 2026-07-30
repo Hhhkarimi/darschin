@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.0.0 — 2026-07-30
+
+- Re-engineered manual data entry around human-readable selectors, examples, and contextual help.
+- Added safe deletion for instructors, student groups, rooms, equipment, arbitrary periods, sessions, courses, and conflicts.
+- Added a searchable manager glossary and four-step completion guide.
+- Added a manager result dashboard with coverage, mandatory-session, room-capacity, day-load, penalty, and workload insights.
+- Added actionable recommendations and management-oriented Excel sheets.
+- Expanded the Excel template with a detailed guide, reference-code sheet, and categorical data validation.
+- Added regression tests for data deletion/remapping, guided controls, timetable orientation, and result insights.
+
 ## 3.0.0 — 2026-07-30
 
 - Redesigned Darschin around a department-manager guided workflow.

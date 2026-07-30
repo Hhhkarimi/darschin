@@ -1,4 +1,5 @@
 import { PENALTY_LABELS, WEEK_PATTERN_LABELS } from "../domain/constants";
+import { buildResultInsights } from "../domain/resultInsights";
 import type { CourseConflict, CourseSection, Equipment, Instructor, Room, ScheduleItem, SoftWeights, SolveResult, StudentGroup, TimetableInput, WeeklySession } from "../domain/types";
 import { downloadBlob, safeFilenamePart } from "./downloads";
 
@@ -224,9 +225,22 @@ export async function exportResultExcel(input: TimetableInput, result: SolveResu
   workbook.subject = "Darschin university timetable";
   const invalid = Boolean(result.hardViolations.length || result.publishable === false);
 
+  const insights = buildResultInsights(input, result);
   addTimetableMatrix(workbook.addWorksheet("برنامه"), input, result.schedule, invalid);
   addRows(workbook.addWorksheet("جلسات تخصیص‌نیافته"), ["جلسه", "اجباری", "دلایل"], result.unscheduled.map((item) => [item.label, item.required ? "بله" : "خیر", item.reasons.join(" | ")]));
   addRows(workbook.addWorksheet("نقض‌ها"), ["نوع", "شرح"], result.hardViolations.map((item) => ["قید سخت", item]));
+  addRows(workbook.addWorksheet("شاخص‌های مدیریتی"), ["شاخص", "مقدار", "توضیح"], [
+    ["پوشش کل جلسات", `${insights.coveragePercent}%`, `${insights.scheduledSessions} از ${insights.totalSessions} جلسه`],
+    ["پوشش جلسات اجباری", `${insights.mandatoryCoveragePercent}%`, `${insights.mandatoryScheduled} از ${insights.mandatoryTotal} جلسه`],
+    ["میانگین استفاده از ظرفیت اتاق‌ها", `${insights.averageRoomUtilizationPercent}%`, `${insights.usedRooms} اتاق استفاده‌شده و ${insights.unusedRooms} اتاق استفاده‌نشده`],
+    ["پرتراکم‌ترین روز", insights.busiestDayLabel, `${insights.busiestDayPeriods} بازهٔ اشغال‌شده`],
+    ["بیشترین بار استاد", insights.heaviestInstructorLabel, `${insights.heaviestInstructorPeriods} بازه در هفته`],
+    ["قابل انتشار", invalid ? "خیر" : "بله", invalid ? "دارای نقض سخت یا جلسهٔ اجباری تخصیص‌نیافته" : "پس از بازبینی نهایی مدیر گروه"],
+    ...insights.recommendations.map((item, index) => [`نکتهٔ قابل اقدام ${index + 1}`, item, ""]),
+  ]);
+  addRows(workbook.addWorksheet("بار روزها"), ["روز", "بازهٔ اشغال‌شده", "جزئیات"], insights.dayBars.map((item) => [item.label, item.value, item.detail]));
+  addRows(workbook.addWorksheet("استفاده از اتاق‌ها"), ["اتاق", "درصد میانگین استفاده از ظرفیت", "جزئیات"], insights.roomBars.map((item) => [item.label, item.value, item.detail]));
+  addRows(workbook.addWorksheet("سهم جریمه‌ها"), ["عامل", "سهم وزن‌دار", "محاسبه"], insights.penaltyBars.map((item) => [item.label, item.value, item.detail]));
   addRows(workbook.addWorksheet("خلاصه کیفیت"), ["شاخص", "مقدار"], [
     ["وضعیت", invalid ? "نامعتبر" : resultStatusLabel(result)],
     ["موتور", result.engine === "ortools-cp-sat" ? "روش دقیق OR-Tools CP-SAT" : "روش سریع مرورگری"],
