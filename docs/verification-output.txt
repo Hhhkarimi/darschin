@@ -1,0 +1,29 @@
+== Offline TypeScript ==
+PASS
+== Domain compile and smoke ==
+{"status":"feasible","scheduled":3,"unscheduled":0,"objective":0,"hard":0}
+DOMAIN_SMOKE_OK
+== Python compile ==
+PASS
+== Python tests ==
+test_impossible_required_session_marks_result_failed (test_cp_sat_solver.CpSatSolverTests.test_impossible_required_session_marks_result_failed) ... skipped "OR-Tools is not installed: No module named 'ortools'"
+test_odd_and_even_sessions_may_share_room_and_time (test_cp_sat_solver.CpSatSolverTests.test_odd_and_even_sessions_may_share_room_and_time) ... skipped "OR-Tools is not installed: No module named 'ortools'"
+test_accepts_minimal_payload (test_payload_validation.PayloadValidationTests.test_accepts_minimal_payload) ... ok
+test_rejects_dangerous_keys (test_payload_validation.PayloadValidationTests.test_rejects_dangerous_keys) ... ok
+test_rejects_duplicate_group_numbers (test_payload_validation.PayloadValidationTests.test_rejects_duplicate_group_numbers) ... ok
+test_rejects_invalid_weight (test_payload_validation.PayloadValidationTests.test_rejects_invalid_weight) ... ok
+test_rejects_missing_solver_setting (test_payload_validation.PayloadValidationTests.test_rejects_missing_solver_setting) ... ok
+test_rejects_more_than_40_courses (test_payload_validation.PayloadValidationTests.test_rejects_more_than_40_courses) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK (skipped=2)
+== Static metadata/security ==
+STATIC_CHECK_OK (35 production text files)
+== Structured file syntax ==
+STRUCTURED_FILES_OK
+== Secret-pattern scan ==
+SECRET_SCAN_OK
+== Symlink scan ==
+NO_SYMLINKS

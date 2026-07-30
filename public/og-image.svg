@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">درس‌چین</title><desc id="desc">برنامه‌ریزی دروس دانشگاهی</desc>
+  <rect width="1200" height="630" fill="#F4F7FC"/>
+  <rect x="70" y="70" width="1060" height="490" rx="42" fill="#243B80"/>
+  <g fill="#fff" font-family="Vazirmatn, sans-serif" text-anchor="middle">
+    <text x="600" y="270" font-size="118" font-weight="800">درس‌چین</text>
+    <text x="600" y="365" font-size="44" opacity=".86">برنامه‌ریزی دروس دانشگاهی</text>
+    <text x="600" y="435" font-size="30" opacity=".7">حل سریع در مرورگر · حل دقیق CP-SAT</text>
+  </g>
+</svg>

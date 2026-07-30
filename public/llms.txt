@@ -1,0 +1,20 @@
+# Darschin (درس‌چین)
+
+Darschin is a Persian university course-timetabling web application for department managers.
+
+Canonical URL: https://darschin.vercel.app/
+Source code: https://github.com/Hhhkarimi/darschin
+Creator: Hossein Karimi — https://www.linkedin.com/in/hossein-karimi-8a452153/
+
+## Capabilities
+- Define course sections and independent weekly sessions.
+- Enforce supported hard constraints for instructors, student groups, rooms, closures, fixed times, fixed rooms, capacity, room type, and required equipment.
+- Optimize configurable soft preferences.
+- Offer a fast in-browser heuristic and an exact-mode CP-SAT service for up to 40 course sections.
+- Export JSON, CSV, and Excel reports.
+
+## Limitations
+- A CP-SAT result is described as proven optimal only when the solver status is OPTIMAL.
+- A FEASIBLE result is valid for the checked model but not proven globally optimal.
+- Partial schedules may contain unscheduled sessions and are labeled accordingly.
+- Data sent to exact mode is processed transiently by the Vercel function and is not intentionally persisted by the application.

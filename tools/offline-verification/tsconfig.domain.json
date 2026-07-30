@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.local.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "/tmp/darschin-domain",
+    "rootDir": "../../src",
+    "types": [],
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "esModuleInterop": true
+  },
+  "include": [
+    "../../src/domain/**/*.ts",
+    "../../src/services/downloads.ts"
+  ],
+  "exclude": [
+    "../../src/**/*.test.ts",
+    "../../src/**/*.test.tsx"
+  ]
+}
